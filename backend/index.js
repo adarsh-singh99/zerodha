@@ -20,16 +20,37 @@ const uri = process.env.MONGO_URL;
 const app = express();
 
 app.use(cors({
-  origin: `http://localhost:${PORT}`,
+  origin: `http://localhost:3000`,
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
 
+
+
+
+app.post("/login", async (req, res) => {
+  res.send("login")
+})
+
 app.use(cookieParser());
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 app.use(bodyParser.json());
+mongoose
+  .connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("MongoDB is  connected successfully"))
+  .catch((err) => console.error(err));
 
-app.use("/", authRoute);
+mongoose.connect(uri);
+console.log("DB started!");
+app.listen(PORT, () => {
+  console.log("App started!");
+  console.log(PORT);
 
+});
 // app.get("/addHoldings", async (req, res) => {
 //   let tempHoldings = [
 //     {
@@ -199,6 +220,9 @@ app.use("/", authRoute);
 //   res.send("Done!");
 // });
 
+app.use("/", authRoute);
+
+
 app.get("/allHoldings", async (req, res) => {
   let allHoldings = await HoldingsModel.find({});
   res.json(allHoldings);
@@ -221,17 +245,4 @@ app.post("/newOrder", async (req, res) => {
 
   res.send("Order saved!");
 });
-mongoose
-  .connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB is  connected successfully"))
-  .catch((err) => console.error(err));
 
-mongoose.connect(uri);
-  console.log("DB started!");
-app.listen(PORT, () => {
-  console.log("App started!");
-  
-});
